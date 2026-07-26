@@ -139,14 +139,6 @@ function LoadGUI()
     local Tools = Window:CreateTab("Tools", 4483362458)
 
     Main:CreateSection("FEATURES")
-    Main:CreateButton({
-        Name = "activate freeze trade",
-        Callback = function()
-            pcall(function()
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/freezebaddies-script/freeze-trade-script/refs/heads/main/Baddies", true))()
-            end)
-        end
-    })
     Main:CreateButton({Name = "force accept trade", Callback = function() end})
 
     Weapons:CreateSection("ALL WEAPONS")
