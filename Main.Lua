@@ -32,7 +32,7 @@ Main:CreateSection("MAIN")
 Main:CreateButton({
     Name = "activate freeze trade",
     Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/baddiesfreeze-glitch/freeze-trade/refs/heads/main/Baddies", true))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/baddiesfreeze-glitch/freeze-trade/refs/heads/main/Main.Lua, true))()
     end
 })
 
